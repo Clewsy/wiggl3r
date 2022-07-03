@@ -26,7 +26,6 @@ void led_pwm_timer_init(void) {
     // TCCR: Timer/Counter Control Registers.
     TCCR3A = 0;
     TCCR3B = (1<<CS31);     // CS: Clock Select (prescaler).
-   
 }
 
 // Turn on or off the LED pulse effect by enabling/disabling the timer interrupt.
