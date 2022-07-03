@@ -97,7 +97,7 @@ void loop(void) {
         digitalWrite(LED_PIN,HIGH); // Turn on the LED (full brightness).
         global_seconds = 0;         // Reset the seconds counter.
         wiggle();                   // Move the mouse cursor.
-        delay(500);                 // Pause for half a second (with LED still full-brightness).
+        delay(LED_FLASH_MS);        // Pause with LED still at full-brightness to indicate a cursor movement.
         led_pulse(true);            // Resume the LED pulse effect.
     }
 

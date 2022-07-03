@@ -3,6 +3,7 @@
 
 #define LED_PIN 13          // On-board LED.
 #define LED_MAX 40          // Maximum analog value (i.e. PWM duty cycle) for LED pulse effect.
+#define LED_FLASH_MS 400    // Duration (milliseconds) the LED is at full brightness to signal a cursor move.
 
 #define TIME_TO_WIGGLE 60   // Numer of seconds to elapse before moving the cursor again.
 #define ONE_SECOND 15625    // Timer ticks every 1/(16MHz/1024(prescaler)) = 0.000064s.  
