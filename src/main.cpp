@@ -1,91 +1,87 @@
 #include "wiggl3r.h"
 
-//#include <Arduino.h>
-//#include "Mouse.h"  //Add from PIO Home -> Libraries -> Search for "Mouse" -> Mouse by arduino -> Add to project.
+uint8_t global_seconds = 0; // USed to count the number of elapsed seconds.  Global as it is needed in loop() and an ISR.
 
-//#define TIME_TO_WIGGLE 60   // Numer of seconds to elapse before moving the cursor again.
-//#define ONE_SECOND 15625    // Timer ticks every 1/(16MHz/1024(prescaler)) = 0.000064s.  
-//                            // Therefore need 15625 ticks for one second.
-#define LED_PIN 13
-uint8_t global_seconds = 0;
 
-void init_wiggle_timer(void) {
-    // TCCR :   Timer/Counter Control Register.
-    // WGM :    Waveform Generation Mode.
-    // CS :     Clock Select.
+// Configure a one-second timer.  The timer will trigger an interrupt that will count seconds.
+// Once a defined number of seconds has elapsed, the wiggle() function will be called. 
+void wiggle_timer_init(void) {
+
+    // TCCR: Timer/Counter Control Registers.
     TCCR1A = 0;
-    TCCR1B = (1<<WGM12) | (1<<CS12) | (1<<CS10); 
-    // Setting WGM1(3:0) to 0b0000 puts timer 1 into CTC mode (Clear Timer on Compare match).
-    // So TCNT1 (Timer Counter 1) register is cleared when it matches OCR1A register (Output Compare Register A).
-    // Setting CS1(2:0) to 0b101 sets the prescaler for Timer/Counter 1 to 1024.
+    TCCR1B = (1<<WGM12) | (1<<CS12) | (1<<CS10);    // WGM: Waveform Generation Mode.  CS: Clock Select (prescaler)
 
-    // OCR :    Output Compare Register.
+    // OCR: Output Compare Register.
     OCR1A = ONE_SECOND;
 
-    // TIMSK : Timer/Counter Mask Register.
-    // OCIE : Output Compare Interrupt Enable.
-    TIMSK1 = (1<<OCIE1A);
+    // TIMSK: Timer/Counter Mask Register.
+    TIMSK1 = (1<<OCIE1A);   // OCIE : Output Compare Interrupt Enable.
 }
 
-void init_led_pwm_timer(void) {
-    // TCCR :   Timer/Counter Control Register.
-    // WGM :    Waveform Generation Mode.
-    // CS :     Clock Select.
-    TCCR3A = 0;
+// Configure a timer that will trigger an interrupt to vary the PWM signal to the LED.
+// This is used to vary the LED brightness and create a pulsing effect.
+// Note, This function does not enable the timer.  This is done with the led_pulse() function.
+void led_pwm_timer_init(void) {
 
-    TCCR3B = (1<<CS31); 
-    // Setting WGM3(3:0) to 0b0000 puts timer 3 into Normal mode (Clear Timer at max count 0xFFFF).
-    // So TCNT3 (Timer Counter 3) register is cleared when it matches max value of 0XFFFF.
-    // Setting CS3(2:0) to 0b010 sets the prescaler for Timer/Counter 3 to 8.
-    // Therefore counter increments at 16MHz/8 and overflows (triggers interrupt) at (16MHz/8)/0xFFFF ~ 30.5Hz.
+    // TCCR: Timer/Counter Control Registers.
+    TCCR3A = 0;
+    TCCR3B = (1<<CS31);     // CS: Clock Select (prescaler).
    
 }
 
+// Turn on or off the LED pulse effect by enabling/disabling the timer interrupt.
 void led_pulse(bool enable) {
 
-    analogWrite(LED_PIN, 0);
+    analogWrite(LED_PIN, 0);            // Turn the LED off first. 
+
+    // TIMSK: Timer/Counter Mask Register.
+    // TOIE: Timer Overflow Interrupt Enable.
     if(enable)  TIMSK3 |= (1<<TOIE3);
     else        TIMSK3 &= ~(1<<TOIE3);
-    // TIMSK : Timer/Counter Mask Register.
-    // OCIE : Output Compare Interrupt Enable.
-    
 }
 
-
+// This interrupt is triggered by the timer used to control the LED PWM and pulse effect.
 ISR(TIMER3_OVF_vect) {
     static uint8_t led_value = 0;
-    static int8_t led_direction = -1;
+    static int8_t led_direction = -1;   // -1:Brightness decreasing, +1:Brightness increasing. 
 
+    // Reverse led_direction at either end of the brightness range.
     if((led_value == 0) | (led_value == LED_MAX)) {
         led_direction = (led_direction ^ -1) + 1;
     }
 
+    // Update the LED brightness.
     led_value = (led_value + led_direction);
     analogWrite(LED_PIN, led_value);
 }
 
-
+// This interrupt is triggered by a timer every 1 second and is used to count seconds.
 ISR(TIMER1_COMPA_vect) {
     global_seconds++;
 }
 
+// This function moves the mouse cursor one pixel in the Y-axis, and alternates direction every time it is called.
 void wiggle(void) {
+
     static int8_t pixels = 1;
 
     // Value of pixels becomes negative of previous value.
     pixels = (pixels ^ -1) + 1;
 
-    // Move the cursos "pixels" in the y-axis.
+    // Move the cursor "pixels" in the y-axis.
     Mouse.move(0, pixels, 0);
 }
 
 void setup(void) {
 
+    // Set pin with the onboard LED as an output.
     pinMode(LED_PIN,OUTPUT);
     
-    init_wiggle_timer();
+    // Initialise the hardware timer for counting seconds.
+    wiggle_timer_init();
 
-    init_led_pwm_timer();
+    // Initialise then enable the timer used for the LED pulse effect.
+    led_pwm_timer_init();
     led_pulse(true);
 
     // Globally enable interrupts.
@@ -96,14 +92,15 @@ void setup(void) {
 }
 
 void loop(void) {
+
     if (global_seconds >= TIME_TO_WIGGLE) {
-        led_pulse(false);
-        digitalWrite(LED_PIN,LOW);
-        global_seconds = 0;
-        wiggle();
-        digitalWrite(LED_PIN,HIGH);
-        delay(500);
-        led_pulse(true);
+        led_pulse(false);           // Disable LED pulse effect.
+        digitalWrite(LED_PIN,HIGH); // Turn on the LED (full brightness).
+        global_seconds = 0;         // Reset the seconds counter.
+        wiggle();                   // Move the mouse cursor.
+        delay(500);                 // Pause for half a second (with LED still full-brightness).
+        led_pulse(true);            // Resume the LED pulse effect.
     }
+
     delay(500);
 }
