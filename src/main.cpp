@@ -41,6 +41,7 @@ void led_pulse(bool enable) {
 
 // This interrupt is triggered by the timer used to control the LED PWM and pulse effect.
 ISR(TIMER3_OVF_vect) {
+
     static uint8_t led_value = 0;
     static int8_t led_direction = -1;   // -1:Brightness decreasing, +1:Brightness increasing. 
 
@@ -56,13 +57,14 @@ ISR(TIMER3_OVF_vect) {
 
 // This interrupt is triggered by a timer every 1 second and is used to count seconds.
 ISR(TIMER1_COMPA_vect) {
+
     global_seconds++;
 }
 
-// This function moves the mouse cursor one pixel in the Y-axis, and alternates direction every time it is called.
+// This function moves the mouse cursor in the Y-axis, alternating direction every time it is called.
 void wiggle(void) {
 
-    static int8_t pixels = 1;
+    static int8_t pixels = PIXEL_DELTA;
 
     // Value of pixels becomes negative of previous value.
     pixels = (pixels ^ -1) + 1;
@@ -74,7 +76,7 @@ void wiggle(void) {
 void setup(void) {
 
     // Set pin with the onboard LED as an output.
-    pinMode(LED_PIN,OUTPUT);
+    pinMode(LED_PIN, OUTPUT);
     
     // Initialise the hardware timer for counting seconds.
     wiggle_timer_init();
@@ -83,18 +85,18 @@ void setup(void) {
     led_pwm_timer_init();
     led_pulse(true);
 
-    // Globally enable interrupts.
-    sei(); 
-
     // Initialise the mouse capability using the Arduino Mouse library.
     Mouse.begin();
+
+    // Globally enable interrupts.  Mey be redundant - triggered by Mouse.begin();.
+    sei(); 
 }
 
 void loop(void) {
 
     if (global_seconds >= TIME_TO_WIGGLE) {
         led_pulse(false);           // Disable LED pulse effect.
-        digitalWrite(LED_PIN,HIGH); // Turn on the LED (full brightness).
+        digitalWrite(LED_PIN, HIGH);// Turn on the LED (full brightness).
         global_seconds = 0;         // Reset the seconds counter.
         wiggle();                   // Move the mouse cursor.
         delay(LED_FLASH_MS);        // Pause with LED still at full-brightness to indicate a cursor movement.
