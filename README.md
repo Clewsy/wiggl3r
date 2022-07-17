@@ -6,11 +6,15 @@ This device will pretend to be a generic mouse when plugged into a USB port.  Ev
 
 ## Hardware
 
-This was achieved with a cheap ATmega32U4 dev-board with card-edge contacts for directly plugging into a USB type-A port.
+This firmware has been tested on two ATmega32U4-based development boards:
+- Beetle - a dev-board that uses the [Arduino Leonardo][link_web_arduino_leonardo] boodloader.
+- [A-Star 32U4 Micro][link_web_pololu_a_star] - a dev board made by [Pololu][link_web_pololu]
 
-The dev-board is a "beetle" and is firmware-compatible with the [Arduino Leonardo][link_web_arduino_leonardo].
+The beetle is a cheap ATmega32U4 dev-board with card-edge contacts for directly plugging into a USB type-A port.  Because it is firmware-compatible with the Arduino Leonardo, it is safe to assume that this firmware will work with the leonardo itself, as well as other leonardo-compatible boards.
 
-There is an on-board LED that provides a pulsing heart-beat, and briefly switches to full-brightness when it moves the cursor.
+The Pololu A-Star 32U4 Micro uses a different bootloader, but no changes are required to the code.  Even the on-board LED is connected to the same pin.  The only change needed is to the [platformio.ini][link_repo_platformio.ini] file if you're using [PlatformIO][link_web_platformio] to program the board.  Un-changed the file is configured for leonardo-compatible boards.  Commenting out the leonardo section and un-commenting the a-star section is all that is required to program the a-star.
+
+In either case, there is an on-board LED that provides a pulsing heart-beat, and briefly switches to full-brightness when it moves the cursor.
 
 ## Firmware
 
@@ -36,6 +40,7 @@ Arduino doesn't seem to maintain any timer/counter interrupt libraries/functions
 [image_wiggl3r_photo]:/data/wiggl3r.jpg
 [image_wiggl3r_gif]:/data/wiggl3r.gif
 
+[link_repo_platformio.ini]:/platformio.ini
 [link_web_arduino]:https://www.arduino.cc/
 [link_web_arduino_analogwrite]:https://www.arduino.cc/reference/en/language/functions/analog-io/analogwrite/
 [link_web_arduino_digitalwrite]:https://www.arduino.cc/reference/en/language/functions/digital-io/digitalwrite/
@@ -44,4 +49,6 @@ Arduino doesn't seem to maintain any timer/counter interrupt libraries/functions
 [link_web_arduino_pinmode]:https://www.arduino.cc/reference/en/language/functions/digital-io/pinmode/
 [link_web_atmega32u4]:https://www.microchip.com/en-us/product/ATmega32U4
 [link_web_platformio]:https://platformio.org/
+[link_web_pololu]:https://www.pololu.com/
+[link_web_pololu_a_star]:https://www.pololu.com/product/3101
 [link_web_vscode]:https://code.visualstudio.com/
