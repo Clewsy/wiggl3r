@@ -10,7 +10,7 @@ This device will pretend to be a generic mouse when plugged into a USB port.  Ev
 ## Hardware
 
 This firmware has been tested on two ATmega32U4-based development boards:
-- Beetle - a dev-board that uses the [Arduino Leonardo][link_web_arduino_leonardo] boodloader.
+- Beetle - a dev-board that uses the [Arduino Leonardo][link_web_arduino_leonardo] bootloader.
 - [A-Star 32U4 Micro][link_web_pololu_a_star] - a dev board made by [Pololu][link_web_pololu]
 
 The beetle is a cheap ATmega32U4 dev-board with card-edge contacts for directly plugging into a USB type-A port.  Because it is firmware-compatible with the Arduino Leonardo, it is safe to assume that this firmware will work with the leonardo itself, as well as other leonardo-compatible boards.
