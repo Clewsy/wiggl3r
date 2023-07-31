@@ -1,3 +1,6 @@
+
+![A wiggly cursor.][image_wiggly_cursor]
+
 # wiggl3r
 
 Use a simple [ATmega32U4][link_web_atmega32u4] microcontroller dev-board to workaround frequent PC timeouts/auto-locking.
@@ -39,6 +42,7 @@ Arduino doesn't seem to maintain any timer/counter interrupt libraries/functions
 
 [image_wiggl3r_photo]:/data/wiggl3r.jpg
 [image_wiggl3r_gif]:/data/wiggl3r.gif
+[image_wiggly_cursor]:/data/wiggl3r_small.png
 
 [link_repo_platformio.ini]:/platformio.ini
 [link_web_arduino]:https://www.arduino.cc/

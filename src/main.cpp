@@ -96,7 +96,7 @@ void setup(void) {
     // Initialise the mouse capability using the Arduino Mouse library.
     Mouse.begin();
 
-    // Globally enable interrupts.  Mey be redundant (triggered by Mouse.begin();.
+    // Globally enable interrupts.  Redundant? (triggered by Mouse.begin();.
     sei(); 
 }
 
